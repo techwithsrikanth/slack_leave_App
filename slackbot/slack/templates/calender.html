@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leave Calendar</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        #calendar {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .fc-event {
+            position: relative;
+        }
+        .fc-event .fc-event-title {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .fc-event-tooltip {
+            display: none;
+            position: absolute;
+            background: #fff;
+            border: 1px solid #ccc;
+            padding: 5px;
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+            z-index: 10;
+            max-width: 200px;
+        }
+        .fc-event:hover .fc-event-tooltip {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <h1>Leave Calendar</h1>
+    <div id="calendar"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var calendarEl = document.getElementById('calendar');
+
+            var leaveData = JSON.parse('{{ leave_data|escapejs }}');
+            // console.log("Leave Data Parsed:", leaveData);  
+
+            var userMapping = {
+                "U07KCUN24TZ": "jamesbilly",
+                "U07KTFLHJ66": "srikanthanprakash2003",
+                "U07KW0E0ESY": "srikanthprakash072003"
+            };
+
+            var events = [];
+            
+            for (var userId in leaveData) {
+                // console.log("Leave Data Parsed:", leaveData);  
+
+                if (leaveData.hasOwnProperty(userId)) {
+                    var username = userMapping[userId] || 'Unknown User';  
+                    var userLeaves = leaveData[userId];
+                    userLeaves.forEach(function(leave) {
+                        var dateRange = leave.start_date + ' to ' + leave.end_date;
+                        events.push({
+                            title: username ,
+                            start: leave.start_date,
+                            end: leave.end_date,
+                            allDay: true,
+                            extendedProps: {
+                                tooltip: username + ': ' +  '<br>Start: ' + leave.start_date + '<br>End: ' + leave.end_date
+                            }
+                        });
+                    });
+                }
+            }
+
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                events: events,
+                editable: true,
+                eventColor: '#008000',
+                eventDidMount: function(info) {
+                    var tooltip = document.createElement('div');
+                    tooltip.className = 'fc-event-tooltip';
+                    tooltip.innerHTML = info.event.extendedProps.tooltip;
+                    info.el.appendChild(tooltip);
+                }
+            });
+
+            calendar.render();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1 @@
+Built a leave application extension in slack using Django, OAuth, Ngrok and users can submit leave requests in various categories and only their respective manager will see and approve, we also have leave statistics and calendar to track the user's leave activities (LOP, Maternity leave, Sick Leave, Casual Leave, etc.) 
